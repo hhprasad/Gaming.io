@@ -89,14 +89,14 @@
 var words = '';
 $(document).ready(function() {
 	
-	words = loadWordsLocally();
-	//words = loadWords($("#level_1").val());
+	//words = loadWordsLocally();
+	words = loadWords($("#level_4").val());
 	wordToBeGuessed = '';
 	guessedWord = '';
 	indices = '';
 	noOfAttempts = 0;
 	lettersUsed = '';
-	
+	levelCounter = 4;
 	$("#newGame").click(function(e){
 		init();
 		for(i = 0 ; i < wordToBeGuessed.word.length ; i++){
@@ -142,11 +142,15 @@ $(document).ready(function() {
 	});
 	
 	function init(){
-		//wordToBeGuessed = words[randomizer()];
-		wordToBeGuessed = words[0];
+		wordToBeGuessed = words[randomizer()];
+		//wordToBeGuessed = words[0];
 		indices = [];
 		guessedWord = [];
+		
 		noOfAttempts = 11;
+		if(levelCounter == 4)
+		noOfAttempts = 5;
+
 		lettersUsed = [];
 		$("#blankWord").html('');
 		$("#winBlock").attr('style','display:none');
@@ -184,6 +188,7 @@ $(document).ready(function() {
 		$("#showHint").attr('style','display:none');
 		$('#meaning').html('');
 		//words = loadWordsLocally();
+		levelCounter=1;
 	});
 	
 	$("#level_2").click(function(e){
@@ -193,6 +198,7 @@ $(document).ready(function() {
 		$("#showHint").attr('style','display:none');
 		$('#meaning').html('');
 		//words = loadWordsLocally();
+		levelCounter=2;
 	});
 	
 	$("#level_3").click(function(e){
@@ -202,6 +208,7 @@ $(document).ready(function() {
 		$("#showHint").attr('style','display:none');
 		$('#meaning').html('');
 		//words = loadWordsLocally();
+		levelCounter=3;
 	});
 	$("#level_4").click(function(e){
 		words = loadWords($("#level_4").val());
@@ -210,6 +217,7 @@ $(document).ready(function() {
 		$("#showHint").attr('style','display:none');
 		$('#meaning').html('');
 		//words = loadWordsLocally();
+		levelCounter=4;
 	});
 	
 	
