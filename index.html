@@ -274,6 +274,8 @@ function displayGuessedWord(guessedWord){
 }
 
 function randomizer(){
+		console.log('randomizer='+$('#level_4').is(':checked'));
+
 	if ($('#level_1').is(':checked')){
 		return Math.floor((Math.random() * 51) + 1);
 	}else{
