@@ -278,12 +278,12 @@ function displayGuessedWord(guessedWord){
 
 function randomizer(){
 	console.log('randomizer='+$('#level_4').is(':checked'));
-	if (($('#level_1').is(':checked')) || $('#level_4').is(':checked')){
-		var num=Math.floor((Math.random() * 51) + 1);
-		console.log('level_4='+num);
-		if ( num > noOfWords ){
-			num = randomizer();
-		}
+	if ($('#level_1').is(':checked')){
+		return Math.floor((Math.random() * 51) + 1);
+	}
+	else if ($('#level_4').is(':checked')){
+		var num=Math.floor((Math.random() * 10) + 1);
+		console.log('level_4='+Math.random());
 		return num;
 	}else{
 		return Math.floor((Math.random() * 4997) + 1);
