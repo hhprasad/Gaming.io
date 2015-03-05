@@ -3,9 +3,304 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Game Zone</title>
+	<title>Game Zone</title>
+	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" rel="stylesheet">
+	<style>
+		.pointer{
+			cursor:pointer;
+		}
+	</style>
 </head>
 <body>
-Welcome to Gaming House
+	<div id="header" class="container table-responsive" align="center">
+		<br>
+		<br>
+		<h1>Game zone</h1>
+		<br>
+		<table>
+			<tr>
+				<td align="center" style="padding:10px;">
+					<input name="gamelevel" id="level_1" value="1" type="radio" checked="true">&nbsp;Easy
+				</td>
+				<td align="center" style="padding:10px;">
+					<input name="gamelevel" id="level_2" value="3" type="radio">&nbsp;Average
+				</td>
+				<td align="center" style="padding:10px;">
+					<input name="gamelevel" id="level_3" value="3" type="radio">&nbsp;Tough
+				</td>
+				<td align="center" style="padding:10px;">
+					<input name="gamelevel" id="level_4" value="3" type="radio">&nbsp;Movie
+				</td>
+			</tr>
+			<tr>
+				<td colspan="3" align="center"><input class="btn btn-success" type="button" value="New Word" id="newGame"></input></td>
+			</tr>
+		</table>
+		<br>
+		<br>
+		<h5>
+			<span id="showRules" class="pointer" style="display:block"><b>See Rules >></b></span><span class="pointer" id="hideRules" style="display:none"><b>Hide Rules <<</b></span>
+			<span id="rules" style="display:none">
+				@ Guess the word by guessing one letter at a time.<br>
+				@ A successful attempt wouldnt reduce the number of attempts.<br>
+				@ You get 11 attempts to guess.
+			</span>
+		</h5>
+	</div>
+	<div id="body" class="container" align="center" style="display:block;">
+		<h2>
+			Guess the WORD!!
+		</h2>
+		<br>
+		<h5>
+			<span id="showHint" class="pointer" style="display:none;"><b>See Meaning >></b></span><span class="pointer" id="hideHint" style="display:none;"><b>Hide Meaning <<</b></span><span id="meaning"></span>
+		</h5>
+		<h2>
+			<span id="blankWord" class="label label-default"></span><br>
+		</h2>
+		<span id="playarea" style="display:none;">
+			<h3>
+				<span id="guessarea" style="display:none">
+					<input type="text" name="inputLetter" id="letter" maxlength="1" size="1" autofocus="autofocus" autocomplete="off"></input>
+					<button name="btnGuess" id="btnGuessLetter" class="btn btn-success" type="button">Guess?</button><br><br>
+				</span>
+				<span id="loseBlock" style="display:none">
+					The word was <span id="correctWord" class="label label-info"></span><br><br>
+					You <span class="label label-primary">LOSE</span><br><br>
+				</span>
+				<span id="winBlock" style="display:none">
+					<br>
+					You <span class="label label-primary">WIN</span><br><br>
+				</span>
+			</h3>				
+			<h4>
+				You have <span id="noOfAttemptLeft" class="label label-success"></span> attempts left.
+			</h4>
+			<h4>
+				<span id="errorMessage" class="label label-danger"></span> 
+			</h4>
+		</span>
+	</div>
+	<input type="hidden" id="gameId" value=""></input>
 </body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+<script>
+var words = '';
+$(document).ready(function() {
+	
+	words = loadWordsLocally();
+	//words = loadWords($("#level_1").val());
+	wordToBeGuessed = '';
+	guessedWord = '';
+	indices = '';
+	noOfAttempts = 0;
+	lettersUsed = '';
+	
+	$("#newGame").click(function(e){
+		init();
+		for(i = 0 ; i < wordToBeGuessed.word.length ; i++){
+			if(wordToBeGuessed.word.charAt(i) == ' '){
+				guessedWord.push(' ');	
+				$("#blankWord").append(' ');
+			} else if(wordToBeGuessed.word.charAt(i) == '-'){
+				guessedWord.push('-');
+				$("#blankWord").append('-');
+			} else {
+				guessedWord.push('.');
+				$("#blankWord").append('.');
+			}
+		}
+	});
+	
+	$("#btnGuessLetter").click(function(e){
+		$("#errorMessage").html('');
+		if(onlyAlphabets()){
+			inputLetter = $("#letter").val().toUpperCase();
+			if(lettersUsed.lastIndexOf(inputLetter) < 0) {
+				lettersUsed.push(inputLetter);
+				isSuccessfulAttempt = false;
+				for(i = 0 ; i < wordToBeGuessed.word.length ; i++){
+					if(inputLetter == wordToBeGuessed.word.charAt(i)){
+						guessedWord[i] = inputLetter;
+						isSuccessfulAttempt = true;
+					}
+				}
+				if(!isGameWon()){
+					if(!isSuccessfulAttempt){
+						noOfAttempts = noOfAttempts - 1;
+					}
+					displayGuessedWord(guessedWord);
+					updateNoOfAttempts(noOfAttempts);	
+				}
+			} else {
+				displayErrorMessage(inputLetter);
+			}
+		}
+		$("#letter").val('');
+		$("#letter").focus();
+	});
+	
+	function init(){
+		//wordToBeGuessed = words[randomizer()];
+		wordToBeGuessed = words[0];
+		indices = [];
+		guessedWord = [];
+		noOfAttempts = 11;
+		lettersUsed = [];
+		$("#blankWord").html('');
+		$("#winBlock").attr('style','display:none');
+		$("#loseBlock").attr('style','display:none');
+		$('#meaning').html(wordToBeGuessed.meaning);
+		$("#playarea").attr('style','display:block');
+		$("#guessarea").attr('style','display:block');
+		$("#errorMessage").html('');
+		$("#showHint").attr('style','display:block');
+		$("#hideHint").click();
+		$("#hideRules").click();
+		$('#noOfAttemptLeft').removeClass('label-danger').addClass('label-success');
+		updateNoOfAttempts(noOfAttempts);
+	}
+	
+	
+	function isGameWon(){
+		guessedWordStr = '';
+		for(i = 0 ; i < guessedWord.length ; i++){
+			guessedWordStr = guessedWordStr.concat(guessedWord[i]);
+		}
+		if(wordToBeGuessed.word.toUpperCase() == guessedWordStr.toUpperCase()){
+			$("#winBlock").attr('style','display:block');
+			$("#guessarea").attr('style','display:none');
+			$("#blankWord").html(wordToBeGuessed.word);
+			return true;
+		}
+		return false;
+	}
+	
+	$("#level_1").click(function(e){
+		//words = loadWords($("#level_1").val());
+				words = loadWordsLocally();
+
+		$("#blankWord").html('');
+		$("#playarea").attr('style','display:none');
+		$("#showHint").attr('style','display:none');
+		$('#meaning').html('');
+		//words = loadWordsLocally();
+	});
+	
+	$("#level_2").click(function(e){
+		words = loadWords($("#level_2").val());
+		$("#blankWord").html('');
+		$("#playarea").attr('style','display:none');
+		$("#showHint").attr('style','display:none');
+		$('#meaning').html('');
+		//words = loadWordsLocally();
+	});
+	
+	$("#level_3").click(function(e){
+		words = loadWords($("#level_3").val());
+		$("#blankWord").html('');
+		$("#playarea").attr('style','display:none');
+		$("#showHint").attr('style','display:none');
+		$('#meaning').html('');
+		//words = loadWordsLocally();
+	});
+	
+});
+
+
+
+$("#showHint").click(function(e){
+	$('#meaning').attr('style','display:block');
+	$('#hideHint').attr('style','display:block');
+	$('#showHint').attr('style','display:none');
+}); 
+
+$("#hideHint").click(function(e){
+	$('#meaning').attr('style','display:none');
+	$('#hideHint').attr('style','display:none');
+	$('#showHint').attr('style','display:block');
+}); 
+
+$("#showRules").click(function(e){
+	$('#rules').attr('style','display:block');
+	$('#hideRules').attr('style','display:block');
+	$('#showRules').attr('style','display:none');
+}); 
+
+$("#hideRules").click(function(e){
+	$('#rules').attr('style','display:none');
+	$('#hideRules').attr('style','display:none');
+	$('#showRules').attr('style','display:block');
+}); 
+
+
+function displayErrorMessage(inputLetter){
+	$("#errorMessage").html("The letter '"+inputLetter+"' has already been used.");
+}
+
+function updateNoOfAttempts(noOfAttempts){
+	if (eval(noOfAttempts) == 0) {
+		$("#correctWord").html(wordToBeGuessed.word);
+		$("#loseBlock").attr('style','display:block');
+		$("#guessarea").attr('style','display:none');
+	} else if(eval(noOfAttempts) < 4 && eval(noOfAttempts) > 0){
+		$('#noOfAttemptLeft').removeClass('label-success').addClass('label-danger');
+	}
+	$("#noOfAttemptLeft").html(noOfAttempts);
+}
+
+function displayGuessedWord(guessedWord){
+	$("#blankWord").html('');
+	for(i = 0 ; i < guessedWord.length ; i++){
+		$("#blankWord" ).append(guessedWord[i]);
+	}
+}
+
+function randomizer(){
+	if ($('#level_1').is(':checked')){
+		return Math.floor((Math.random() * 51) + 1);
+	}else{
+		return Math.floor((Math.random() * 4997) + 1);
+	}
+}
+
+function loadWordsLocally(){
+	wordDict = "{\"SEA-DRAKE\":\"The pewit gull.\",\"DEFIGURE\":\"To delineate.These two stones as they are here defigured. Weever.\",\"PECULIARIZE\":\"To make peculiar; to set appart or assign, as an exclusivepossession. [R.] Dr. John Smith.\"}";
+	wordDict = "{\"THOR\":\"The pewit gull.\",\"MASK\":\"To delineate.\",\"HULK\":\"To delineate.\",\"JAWS\":\"To make peculiar; to set appart or assign, as an exclusivepossession. [R.] Dr. John Smith.\"}";
+	wordDict = JSON.parse(wordDict);
+	var words = [];
+	$.each( wordDict, function( key, val ) {
+		var obj = new Object();
+		obj.word = key;
+		obj.meaning = val;
+		words.push(obj);
+	});
+	return words;
+}
+
+function loadWords(level){
+	var words = [];
+	jQuery.get('dictionary.json.'+level, function(wordDict) {
+		$.each( JSON.parse(wordDict), function( key, val ) {
+			var obj = new Object();
+			obj.word = key;
+			obj.meaning = val;
+			words.push(obj);
+		});
+	});
+	return words;
+}
+
+function onlyAlphabets() {
+	var regex = /^[a-zA-Z]*$/;
+	if (regex.test($("#letter").val())) {
+		return true;
+	} else {
+		$("#errorMessage").html("Alphabets Only");
+		return false;
+	}
+}
+
+</script>
 </html>
