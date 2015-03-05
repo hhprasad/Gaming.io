@@ -97,7 +97,6 @@ $(document).ready(function() {
 	noOfAttempts = 0;
 	lettersUsed = '';
 	levelCounter = 4;
-	console.log('words-'+words)
 	$("#newGame").click(function(e){
 		init();
 		for(i = 0 ; i < wordToBeGuessed.word.length ; i++){
@@ -218,6 +217,7 @@ $(document).ready(function() {
 		$("#showHint").attr('style','display:none');
 		$('#meaning').html('');
 		//words = loadWordsLocally();
+		console.log('words-'+words.length);		
 		levelCounter=4;
 	});
 	
