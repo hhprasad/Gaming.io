@@ -97,6 +97,7 @@ $(document).ready(function() {
 	noOfAttempts = 0;
 	lettersUsed = '';
 	levelCounter = 4;
+	noOfWords = 0;
 	$("#newGame").click(function(e){
 		init();
 		for(i = 0 ; i < wordToBeGuessed.word.length ; i++){
@@ -143,6 +144,8 @@ $(document).ready(function() {
 	
 	function init(){
 		wordToBeGuessed = words[randomizer()];
+		noOfWords = wordToBeGuessed.length;
+		console.log('No of words loaded='+wordToBeGuessed.length);
 		//wordToBeGuessed = words[0];
 		indices = [];
 		guessedWord = [];
@@ -278,6 +281,9 @@ function randomizer(){
 	if (($('#level_1').is(':checked')) || $('#level_4').is(':checked')){
 		var num=Math.floor((Math.random() * 51) + 1);
 		console.log('level_4='+num);
+		if ( num > noOfWords ){
+			num = randomizer();
+		}
 		return num;
 	}else{
 		return Math.floor((Math.random() * 4997) + 1);
